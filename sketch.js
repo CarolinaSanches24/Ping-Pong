@@ -21,6 +21,7 @@ let velocidadeYOponente;
 
 let meusPontos = 0;
 let pontosDoOponente = 0;
+let pontuacaoVencedora = 5;
 
 //sons do jogo
 
@@ -28,15 +29,19 @@ let raquetada;
 let ponto;
 let trilha;
 
+
 function preload() {
   trilha = loadSound("trilha.mp3");
   ponto = loadSound("ponto.mp3");
   raquetada = loadSound("raquetada.mp3");
+  winner = loadImage("winner.png");
+  robot = loadImage("robot.png");
 }
 
 function setup() {
   createCanvas(600, 400);
   trilha.loop();
+  tempoInicial = millis();
 }
 
 function draw() {
@@ -48,19 +53,21 @@ function draw() {
   mostraRaquete(xRaqueteHorizontal, yRaqueteVertical);
   movimentaRaqueteSetas();
   colisaoRaquete();
+  bolinhaNaoFicaPresa();
   mostraRaquete(xRaqueteOponente, yRaqueteOponente);
   movimentaOponente();
   colisaoOponente();
   divisaoCampo();
   incluirPlacar();
   marcarPonto();
-
+  stopGame();
 }
 function mostraBolinha() {
   circle(xBolinha, yBolinha, diametro);
 }
 function mostraRaquete(x, y) {
   rect(x, y, larguraRaquete, alturaRaquete);
+  fill(255);
 }
 function movimentarBolinha() {
   xBolinha += velocidadeXBolinha;
@@ -94,7 +101,9 @@ function colisaoRaquete() {
 
 function movimentaOponente() {
   velocidadeYOponente = yBolinha - yRaqueteOponente - larguraRaquete / 2 - 30;
-  yRaqueteOponente += velocidadeYOponente + 50;
+  yRaqueteOponente += velocidadeYOponente + 60;
+
+
 }
 
 function colisaoOponente() {
@@ -140,3 +149,34 @@ function marcarPonto() {
     ponto.play();
   }
 }
+
+function bolinhaNaoFicaPresa() {
+  if (xBolinha + raio < 0) {
+    console.log('bolinha ficou presa');
+    xBolinha = 300;
+  }
+}
+
+function stopGame() {
+  if (meusPontos >= pontuacaoVencedora) {
+    textAlign(CENTER, CENTER);
+    textSize(48);
+
+    rect(150, 50, 300, 300);
+    fill(0);
+    text("Você venceu!", 300, 90);
+    image(winner, 180, 100, 250, 250);
+    noLoop(); // Isso para o loop de desenho, impedindo que o jogo continue sendo desenhado
+  } else if (pontosDoOponente >= pontuacaoVencedora) {
+    textAlign(CENTER, CENTER);
+    textSize(30);
+    rect(150, 50, 300, 300);
+    fill(0);
+    text("A maquina venceu!", 300, 90);
+    image(robot, 180, 100, 250, 250);
+    noLoop(); // Isso para o loop de desenho, impedindo que o jogo continue sendo desenhado
+    trilha.stop();
+  }
+}
+
+
